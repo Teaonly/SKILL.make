@@ -26,6 +26,38 @@ SKILL.make brings the declarative, dependency-driven paradigm of Makefiles to th
 | **`? prompt`** | **Reasoning** | Free-form prompts where the Agent decides the action. |
 | **`ifeq`** | **Logic** | Conditional branching based on state or env vars. |
 
+## A Simple Example
+
+Below is a typical code-review skill written in SKILL.make format:
+
+````markdown
+---
+name: code-review
+description: A full code review workflow.
+---
+
+```makefile
+# Variables
+CODE_DIR = src/
+
+# Target: review — run a full code review
+review: lint test summary
+
+lint:
+	@ cd $(CODE_DIR) && eslint . --format json
+
+test:
+	@ cd $(CODE_DIR) && npm test
+
+summary: lint test
+	? Based on lint errors and test failures, write a review summary.
+```
+
+### Addtional info is also OK.
+````
+
+
+
 ## Status
 
 This is a **proof-of-concept** specification. This specification is designed to be compatible with most Agent Harness implementations.
