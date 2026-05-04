@@ -1,24 +1,24 @@
-# SKILL.mk — A Makefile-Format SKILL Document
+# SKILL.mk 一种 Makefile 格式的 SKILL 文档
 
-This project proposes a specification for SKILL documents in Makefile format. These documents offer clear logical chains, low token consumption (on-demand loading), verifiability, and auditability.
+本项目提出一种 Makeifile 格式的 SKILL 文档规范，这种文档具备逻辑链清晰、Token消耗少（按需加载）、可检验、可审计等优点。
 
-## Why Makefile Format
+## 为什么采用 Makefile 格式
 
-Makefile-format SKILL documents have the following advantages, making them well-suited for integration into Agent frameworks:
+Makefile 格式的 SKILL 文档，具有以下的优点，非常适合应用到 Agent 框架中。
 
-- **Built-in Logical DAG**: Most SKILLs implicitly contain a logical DAG, which is essentially a Plan Mode. Describing it with an explicit DAG not only reduces the token cost of descriptions, but also improves Agent execution accuracy and lowers error rates.
+- **内置逻辑链 DAG** : 大多数的 SKILL 都隐含一个逻辑 DAG，这个逻辑 DAG 实际上就是一种 Plan Mode，直接用显示的 DAG 描述，不仅仅可以降低描述说明的 Token 成本，同时可以提供 Agent 执行准确性，降低错误率。
 
-- **On-Demand Loading**: The meta information in SKILL.mk provides a keyword list, where each keyword directly corresponds to a Makefile target. Through a dedicated SKILL.mk loader tool, only the relevant Recipe context is loaded on demand. This effectively reduces token costs at Agent runtime.
+- **按需加载的能力** : 在 SKILL.mk 的 meta 信息，提供关键词列表，这些关键词直接对应 Makefile 中的 target，因此通过专门的 SKILL.mk 加载工具，实现按需加载对应的 Recipe 上下文。在 Agent 运行时，可以有效的降低 Token 成本。
 
-- **Strong Verifiability**: SKILL.mk itself is verifiable and runnable, and also supports auditability (git tracking, invocation statistics, etc.). It is well-suited for self-evolution, especially since individual Recipes can be optimized independently.
+- **强大的可检验性**： SKILL.mk 本身是可检验、可运行的，同时具备可审计性（git跟踪，调用统计等），非常适合自演化，特别是 Recipe 可以单独优化。
 
-- **Easy Integration**: Makefile is a battle-tested format. Makefile parsing tools are readily available and can be easily integrated into existing Agent frameworks.
+- **支持简单**: Makefile 是一种久经考验的工具，很容易找到 Makefile 解析工具，并且集成到现有的 Agent 框架里面。
 
-## Example: Web Search SKILL
+## 以Web Search 使用SKILL为例子
 
-Here we use the Web Search SKILL as an example to compare the two formats. Web Search is frequently used and sufficiently representative.
+这里以Web Search SKILL，展示一个两种格式的对比，Web Search SKILL 使用非常频繁，足够典型。
 
-### Standard SKILL.md Format
+### 标准的 SKILL.md 格式
 
 ````markdown
 ---
@@ -103,7 +103,7 @@ Content: (if --content flag used)
 
 ````
 
-### SKILL.mk Format
+### SKILL.mk 格式
 
 ````makefile
 ---
@@ -113,11 +113,11 @@ target: when-to-use setup query
 ---
 
 when-to-use:
-    Web search and content extraction using the official Brave Search API. No browser required.
+    Web search and content extraction using the official Brave Search API. No browser required. 
     - Searching for documentation or API references
     - Looking up facts or current information
     - Fetching content from specific URLs
-    - Any task requiring web search without interactive browsing
+    - Any task requiring web search without interactive browsing   
 
 setup: when-to-use
     Requires a Brave Search API account with a free subscription. A credit card is required to create the free subscription (you won't be charged).
@@ -127,7 +127,7 @@ setup: when-to-use
 
     4. Add to your shell profile (`~/.profile` or `~/.zprofile` for zsh):
     @export BRAVE_API_KEY="your-api-key-here"
-
+    
     5. Install dependencies (run once):
     @cd {baseDir}
     @npm install
@@ -166,27 +166,26 @@ output_format:
     ...
 ````
 
-### Comparison
+### 两种格式比较
 
-| Aspect | SKILL.md | SKILL.mk |
-| ------ | -------- | -------- |
-| Full Load | Loaded all at once, 2165 characters | Loaded all at once, only 2014 characters — 7% reduction |
-| On-Demand Load * | Not supported | Probe-load `readme` only, 313 characters — 85% reduction |
-| Auditability * | Entire file as unit, no decomposition | Recipe-level invocation tracking, individual success rates |
+| 比较项目 | SKILL.md | SKILL.mk |
+| -------- | -------- | -------- |
+| 全加载 | 一次性完整加载，2165 个字符 | 一次完全加载，只需要 2014，减少 7% |
+| 动态加载 * | 不支持 | 仅仅试探加载 readme，只需要 313 个字符，减少 85%   |
+| 可审计 * | 整体文件为单位，无法分拆 | 以 recipe 为调用单位，可跟踪单独调用成功率 |
 
-\* Requires a dedicated Agent tool. Without such tooling support, SKILL.mk can also serve as a drop-in replacement for SKILL.md files.
+"*" 需要专门的Agent 工具，如没有专门的工具支持，也可平替SKILL.md 文件
 
-## 1.0 Specification
+## 1.0 规范定义
 
-| # | Rule | Description |
-| - | ---- | ----------- |
-| 1 | On-Demand Loading | `target = []` means full load; `target = ['readme']` means load only `readme` and its dependencies |
-| 2 | Recipe Definition | A recipe is multi-line text where each line starts with `\t`; the target name must be a string without spaces |
-| 3 | Recipe Loading | Full loading form: `name:[dep1 dep2]\n\tline1\n\tline2\n`; recipes are loaded in definition order |
-| 4 | Other | Aside from recipe loading, no other content from the SKILL.mk file is loaded |
+| 编号 | 规则 | 规则说明 |
+| -------- | -------- | -------- |
+| 1 | 按需加载 | 参数 target = [] 表示全加载，target =['readme'] 表示仅加载 readme 以及依赖 |
+| 2 | recipe 定义| 整个 recipe 为多行文本，每行以\t开头，target 名字必须为不包含空格的字符串 |
+| 3 | recipe 加载| 完整的加载形式：name:[dep1 dep2]\n\tline1\n\tline2\n, recipe 按定义顺序|
+| 4 | 其他 | 除了 recipe 加载之外，SKILL.mk文件其他内容不加载 |
 
-
-## Format Comparison
+## 格式对比
 
 We tested a complete SKILL collection (from the well-known "Skills for Real Engineers" — https://github.com/mattpocock/skills) using the Makefile format. It not only improves logical structure and readability, but more importantly, these SKILL.make files are well-suited for auditing (git tracking, invocation statistics) and lay a solid foundation for Evolution Engineering.
 
@@ -220,7 +219,7 @@ TOTAL                                         66394      56451     -14%
 
 ## Status
 
-This is a **proof-of-concept** specification. It is designed to be compatible with most Agent Harness implementations.
+This is a **proof-of-concept** specification. This specification is designed to be compatible with most Agent Harness implementations.
 
 ## License
 

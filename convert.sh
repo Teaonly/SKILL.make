@@ -1,20 +1,20 @@
 #!/bin/bash
 
-SKILL_SPEC='https://github.com/Teaonly/SKILL.make/blob/main/README.md'
+SKILL_SPEC='./README.md'
 
 for src in examples/*/SKILL.md; do
     dir=$(dirname "$src")
-    out="$dir/SKILL.make"
+    out="$dir/SKILL.mk"
     [ -f "$out" ] && continue
     echo "Converting $src -> $out"
-    claude -p "Read '$SKILL_SPEC' for the SKILL.make format specification. Convert '$src' to SKILL.make format and write the result to '$out'. Keep the frontmatter (name, description). Rewrite all prose rules into Makefile-styled targets with @/\$/? prefixed recipes. Preserve the original intent and behavior. Keeping Makefile simple and small size." \
+    claude -p "Read '$SKILL_SPEC' for the SKILL.mk format specification. Convert '$src' to SKILL.mk format and write the result to '$out'. Keep the frontmatter (name, description). Rewrite all prose rules into Makefile-styled targets with @/\$/? prefixed recipes. Preserve the original intent and behavior. Keeping Makefile simple and small size." \
         --allowedTools "Read,Write,Edit,Bash(find:*)" \
         2>/dev/null
 done
 
 
 # Size comparison report
-printf "\n%-40s %10s %10s %8s\n" "File" "SKILL.md" "SKILL.make" "Change"
+printf "\n%-40s %10s %10s %8s\n" "File" "SKILL.md" "SKILL.mk" "Change"
 printf "%-40s %10s %10s %8s\n" "$(printf '%0.s-' {1..40})" "$(printf '%0.s-' {1..10})" "$(printf '%0.s-' {1..10})" "$(printf '%0.s-' {1..8})"
 
 total_old=0
@@ -24,7 +24,7 @@ count=0
 for src in examples/*/SKILL.md; do
     dir=$(dirname "$src")
     name=$(basename "$dir")
-    out="$dir/SKILL.make"
+    out="$dir/SKILL.mk"
 
     old=$(wc -c < "$src")
     total_old=$((total_old + old))
